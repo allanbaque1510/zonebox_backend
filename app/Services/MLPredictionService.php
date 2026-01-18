@@ -39,11 +39,13 @@ class MLPredictionService
             $data = $this->prepararDatos($pedido);
             $cacheKey = $this->generarCacheKey($data);
             
-            return $this->cache->remember(
-                $cacheKey,
-                now()->addHour(),
-                fn() => $this->ejecutarPrediccion($data)
-            );
+            return $this->ejecutarPrediccion($data);
+            
+            // return $this->cache->remember(
+            //     $cacheKey,
+            //     now()->addHour(),
+            //     fn() => $this->ejecutarPrediccion($data)
+            // );
             
         } catch (\Exception $e) {
             Log::error('Error en predicción ML', [
@@ -83,11 +85,10 @@ class MLPredictionService
      */
     private function ejecutarPrediccion(array $data): array
     {
-        $scriptPath = storage_path('app/ml/scripts/predict.py');
+        $scriptPath = base_path('storage/app/ml/scripts/predict.py');
         Log::info("Este es el path: {$this->pythonPath}");
-        // $process = Process::fromShellCommandline(
-        //     sprintf('%s %s', $this->pythonPath, escapeshellarg($scriptPath))
-        // );
+        Log::info("Este es el script_path: {$scriptPath}");
+    
         $process = new Process([
             $this->pythonPath,
             $scriptPath,
@@ -96,15 +97,22 @@ class MLPredictionService
         $process->setInput(json_encode($data));
         $process->setTimeout($this->timeout);
         
+        $process->setEnv([
+            'HOME' => '/home/allancode', // Carpeta base del usuario
+            'OMP_NUM_THREADS' => '1',    // Forzar 1 solo hilo
+            'OPENBLAS_NUM_THREADS' => '1',
+            'MKL_NUM_THREADS' => '1',
+            // Dile a Python dónde están tus librerías instaladas
+            'PYTHONPATH' => '/home/allancode/virtualenv/zonebox.allancode.dev/storage/app/ml/3.11/lib/python3.11/site-packages'
+        ]);
+        
         try {
             $process->mustRun();
             
             $resultado = json_decode($process->getOutput(), true);
             
             if (!$resultado || !($resultado['success'] ?? false)) {
-                Log::warning('Predicción ML con error', [
-                    'error' => $resultado['error'] ?? 'unknown'
-                ]);
+                Log::warning($resultado);
                 return $this->fallbackPrediction();
             }
             

@@ -10,7 +10,7 @@ return [
     | Ruta al ejecutable de Python. Puede ser un entorno virtual.
     |
     */
-    'python_path' => storage_path(env('ML_PYTHON_PATH', 'python3')),
+    'python_path' => env('ML_PYTHON_PATH', 'python3'),
     
     /*
     |--------------------------------------------------------------------------
@@ -40,7 +40,7 @@ return [
     | Tiempo máximo de espera para predicciones (segundos)
     |
     */
-    'prediction_timeout' => 10,
+    'prediction_timeout' => 120,
     
     /*
     |--------------------------------------------------------------------------

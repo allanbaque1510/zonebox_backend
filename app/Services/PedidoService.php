@@ -108,8 +108,8 @@ class PedidoService
 
     public function show ( Pedido $pedido) {
       try {
-            // $prediccion = $this->_mlPredictionService->predecir($pedido);
-            // Log::info(json_encode( $prediccion, JSON_PRETTY_PRINT ));
+            $prediccion = $this->_mlPredictionService->predecir($pedido);
+            Log::info(json_encode( $prediccion, JSON_PRETTY_PRINT ));
             $data = $pedido->load('empresaEnvio', 'tienda', 'ciudadDestino', 'historialEstados','estado');
             return $data; 
 
