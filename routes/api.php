@@ -20,8 +20,9 @@ Route::any('/no-autorizado', function (Request $request) {
 
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user',[AuthController::class,'getUser']);
     Route::get('/verificarToken',[AuthController::class,'verificarToken']);
-    Route::get('/logout', [AuthController::class,'cerrarSession']);
+    Route::get('/logout', [AuthController::class,'logOut']);
     
     // Rutas de Pedidos
     Route::get('pedidos/lista', [PedidoController::class, 'listaPedidos']);

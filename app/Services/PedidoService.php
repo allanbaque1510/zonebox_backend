@@ -58,15 +58,15 @@ class PedidoService
         } catch (ValidationException $e) {
             throw new ValidationException($e->getMessage());
         }  catch (Exception $e) {
-            Log::error($e);
             throw new Exception($e->getMessage());
         }   
     }
     private function calcularDiasEstimados($fechaEntregaEstimada){
         $fechaActual = now();
+        if(empty($fechaEntregaEstimada)) return 'No definido';
+        
         $fechaEntregaEstimada = Carbon::parse($fechaEntregaEstimada)->startOfDay();
         $diferencia = (int) $fechaActual->diffInDays($fechaEntregaEstimada, false);
-        Log::info("Diferencia de días: " . $diferencia);
         $diferencia = $diferencia >= 0 ? $diferencia : 0;
 
         return match (true) {
@@ -101,7 +101,6 @@ class PedidoService
         } catch (ValidationException $e) {
             throw new ValidationException($e->getMessage());
         }  catch (Exception $e) {
-            Log::error($e);
             throw new Exception($e->getMessage());
         }   
     }
@@ -109,8 +108,8 @@ class PedidoService
 
     public function show ( Pedido $pedido) {
       try {
-            $prediccion = $this->_mlPredictionService->predecir($pedido);
-            Log::info(json_encode( $prediccion, JSON_PRETTY_PRINT ));
+            // $prediccion = $this->_mlPredictionService->predecir($pedido);
+            // Log::info(json_encode( $prediccion, JSON_PRETTY_PRINT ));
             $data = $pedido->load('empresaEnvio', 'tienda', 'ciudadDestino', 'historialEstados','estado');
             return $data; 
 
@@ -157,9 +156,6 @@ class PedidoService
 
                 if ( ! $historialAnterior )  throwValidation("Estado anterior no encontrado");
 
-                
-                
-                
                 $historialAnterior->fecha = now();
                 $historialAnterior->completado = true;
                 $historialAnterior->save();
@@ -222,8 +218,15 @@ class PedidoService
                 'codigo'            => $codigo,
                 'numero_tracking'   => $dataRequest['numero_tracking'],
                 'descripcion'       => $dataRequest['descripcion'],
-                'id_usuario'        => $idUsuario,
+                'id_empresa_envio'  => $dataRequest['id_empresa_envio'],
+                'id_tienda'         => $dataRequest['id_tienda'],
+                'otra_tienda'       => $dataRequest['otra_tienda'],
+                'id_ciudad_destino' => $dataRequest['id_ciudad_destino'],
+                'instruccion'       => $dataRequest['instruccion'],
+                'id_cliente'        => $idUsuario,
                 'id_estado'         => $estado->id,
+                'anio'              => now()->year,
+                'activo'            => true,
             ];
 
             return Pedido::create($data);

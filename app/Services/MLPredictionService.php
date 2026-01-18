@@ -84,10 +84,14 @@ class MLPredictionService
     private function ejecutarPrediccion(array $data): array
     {
         $scriptPath = storage_path('app/ml/scripts/predict.py');
-        
-        $process = Process::fromShellCommandline(
-            sprintf('%s %s', $this->pythonPath, escapeshellarg($scriptPath))
-        );
+        Log::info("Este es el path: {$this->pythonPath}");
+        // $process = Process::fromShellCommandline(
+        //     sprintf('%s %s', $this->pythonPath, escapeshellarg($scriptPath))
+        // );
+        $process = new Process([
+            $this->pythonPath,
+            $scriptPath,
+        ]);
         
         $process->setInput(json_encode($data));
         $process->setTimeout($this->timeout);

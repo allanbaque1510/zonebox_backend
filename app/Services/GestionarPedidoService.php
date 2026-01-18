@@ -41,7 +41,6 @@ class GestionarPedidoService
                 'pedidosPendientes'         => $this->pedidoTransform($sqlPedidosPedientes->get()),
                 'pedidosEnGestion'          => $this->pedidoTransform($sqlPedidosEnGestion->get()),
             ];
-            Log::info(json_encode($data, JSON_PRETTY_PRINT));
             return $data;
         } catch (ValidationException $e) {
             throwValidation($e->getMessage());

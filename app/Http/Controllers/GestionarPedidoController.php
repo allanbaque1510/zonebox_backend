@@ -55,7 +55,6 @@ class GestionarPedidoController extends Controller
     public function show( Pedido $gestionarPedido)
     {
         try {   
-            Log::info(json_encode($gestionarPedido, JSON_PRETTY_PRINT));
             $data = $this->_gestionarPedidoService->show($gestionarPedido);
             return response()->json(["ok"=>true, 'data' => $data],200);
         } catch (Exception $e) {
@@ -81,7 +80,6 @@ class GestionarPedidoController extends Controller
 
         } catch (ValidationException $e) {
             $dataerror = responseErrorValidation($e);
-            Log::info(json_encode($dataerror, JSON_PRETTY_PRINT));
             return $dataerror;
 
         } catch (Exception $e) {

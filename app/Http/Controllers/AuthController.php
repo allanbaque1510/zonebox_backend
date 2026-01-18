@@ -103,7 +103,6 @@ class AuthController extends Controller
         try {   
             $request->user()->tokens()->delete();
                         
-
             return response()->json(["ok"=>true, 'data' => ['message' => 'Logout exitoso']],200);
         } catch (Exception $e) {
             return responseErrorController($e,400);
@@ -113,7 +112,7 @@ class AuthController extends Controller
     public function getUser(Request $request){
         try {
             $user = Auth::user();
-            Log::info(json_encode($user, JSON_PRETTY_PRINT));
+            
             if(!$user) throwValidation("No existe un usuario autenticado");
             
             return response()->json([
@@ -123,11 +122,9 @@ class AuthController extends Controller
             
   
         } catch (ValidationException $e) {
-            Log::error($e);
             return responseErrorValidation($e);
 
         } catch (Exception $e) {
-            Log::error($e);
             return responseErrorController($e,401);
         }
     }
